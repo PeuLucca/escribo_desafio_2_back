@@ -36,7 +36,11 @@ app.listen(port, () => {
 
 // Token
 const generateJwtToken = (email) => {
-    return jwt.sign({ email }, secretKey, { expiresIn: '30m' });
+    const tokenData = {
+        email: email,
+        hash: bcrypt.hashSync(email + secretKey, 10)
+    };
+    return jwt.sign(tokenData, secretKey, { expiresIn: '30m' });
 }
 
 const authenticateToken = (req, res, next) => {
@@ -46,7 +50,7 @@ const authenticateToken = (req, res, next) => {
         return res.status(401).json({ mensagem: 'Não autorizado' });
     }
 
-    jwt.verify(token.replace('Bearer ', ''), secretKey, (err, user) => {
+    jwt.verify(token.replace('Bearer ', ''), secretKey, (err, tokenData) => {
         if (err) {
             if (err.name === 'TokenExpiredError') {
                 return res.status(401).json({ mensagem: 'Token expirado' });
@@ -54,11 +58,10 @@ const authenticateToken = (req, res, next) => {
                 return res.status(403).json({ mensagem: 'Não autorizado' });
             }
         }
-        req.user = user;
+        req.user = tokenData;
         next();
     });
 };
-
 
 // Sign Up (Criação de Cadastro):
 app.post('/signup', async (req, res) => {
@@ -131,7 +134,7 @@ app.post('/signin', (req, res) => {
         db.query('UPDATE usuario SET token = ?, ultimo_login = ? WHERE id = ?', [token, now, usuario.id], (updateError) => {
           if (updateError) {
             console.error('Erro ao atualizar o token e a última data de login:', updateError);
-            return res.status(500).json({ mensagem: 'Erro interno do servidor' });
+            return res.status(500).json({ mensagem: updateError });
           }
   
           res.json({
