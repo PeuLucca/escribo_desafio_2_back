@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = process.env.PORT || 5000;
+const port = "https://escribo-api-82f3e4f3b959.herokuapp.com/";
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
