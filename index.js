@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
-const port = "https://escribo-api-82f3e4f3b959.herokuapp.com/";
+const port = "https://escribo-api-82f3e4f3b959.herokuapp.com";
 const mysql = require('mysql2');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
@@ -31,8 +31,12 @@ db.connect((err) => {
 
 // Servidor rodando
 app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
+  console.log(`Servidor rodando na porta ${port}`);
 });
+
+app.get('/', (req, res) => {
+  return res.json('Sucesso ao conectar server!');
+})
 
 // Token
 const generateJwtToken = (email) => {
